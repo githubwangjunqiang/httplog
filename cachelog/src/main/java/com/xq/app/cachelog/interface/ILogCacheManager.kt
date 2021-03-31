@@ -8,7 +8,7 @@ interface ILogCacheManager {
      * 初始化
      * @param context app 的上下文 全局上下文
      */
-    fun initContext(context: Context)
+    fun initContext(context: Context,userId:String)
 
     /**
      * 存入日志  请求接口的日志

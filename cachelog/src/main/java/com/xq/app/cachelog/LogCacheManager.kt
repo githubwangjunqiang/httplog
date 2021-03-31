@@ -15,6 +15,11 @@ object LogCacheManager : ILogCacheManager {
     var context: Context? = null
 
     /**
+     * 用户自定义标识
+     */
+    var userId: String? = null
+
+    /**
      * 缓存所用协程
      */
     private var launchJob = GlobalScope
@@ -23,15 +28,21 @@ object LogCacheManager : ILogCacheManager {
      * 初始化时间  也作为此次进程所有日志保存的文件夹
      */
     var initTime = 0L
-    override fun initContext(context: Context) {
+    override fun initContext(context: Context, userId: String) {
         this.context = context.applicationContext
+        this.userId = userId
         initTime = System.currentTimeMillis()
     }
 
     override fun saveLoadLog(logDataCacheData: LogHttpCacheData?) {
         logDataCacheData?.let {
+            it.logId = System.currentTimeMillis()
             launchJob.launch(Dispatchers.IO) {
-                LogDBHelper.singleton.addLogData(it)
+                try {
+                    LogDBHelper.singleton.addLogData(it)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
 

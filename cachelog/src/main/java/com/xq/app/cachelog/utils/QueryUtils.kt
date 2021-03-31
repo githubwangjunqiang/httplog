@@ -14,7 +14,8 @@ import com.xq.app.cachelog.entiy.LogHttpCacheData
  * 获取 loadHttpLogData 类型
  */
 fun Cursor.loadHttpLogData(): LogHttpCacheData {
-    var data = LogHttpCacheData(loadLong(LogHttpCacheData.logId_key))
+    var data = LogHttpCacheData()
+    data.logId = loadLong(LogHttpCacheData.logId_key)
     data.userId = loadString(LogHttpCacheData.userId_key)
     data.durration = loadString(LogHttpCacheData.durration_key)
     data.startTime = loadLong(LogHttpCacheData.startTime_key)

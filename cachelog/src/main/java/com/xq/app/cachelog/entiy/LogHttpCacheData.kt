@@ -2,12 +2,7 @@ package com.xq.app.cachelog.entiy
 
 import android.content.ContentValues
 
-data class LogHttpCacheData(
-    /**
-     * 日志id标识付
-     */
-    var logId: Long
-) {
+class LogHttpCacheData {
     companion object {
         /**
          * 表名称
@@ -89,6 +84,11 @@ data class LogHttpCacheData(
 
 
     }
+
+    /**
+     * 日志id标识付
+     */
+    var logId: Long = 0
 
     /**
      * 用户 标识
