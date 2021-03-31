@@ -1,0 +1,3 @@
+include ':cachelog'
+include ':app'
+rootProject.name = "LogCache"
