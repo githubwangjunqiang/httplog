@@ -48,5 +48,14 @@ object LogCacheManager : ILogCacheManager {
 
     }
 
+    override suspend fun getLogs(startIndex: Long, count: Long): List<LogHttpCacheData>? {
+        return LogDBHelper.singleton.loadLogDataList(startIndex, count)
+    }
+
+
+    override suspend fun getLogCounts(): Long {
+        return LogDBHelper.singleton.loadDataCount()
+    }
+
 
 }

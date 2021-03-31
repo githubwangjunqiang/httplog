@@ -1,7 +1,9 @@
 package com.xq.app.cachelog.entiy
 
 import android.content.ContentValues
+import androidx.annotation.Keep
 
+@Keep
 class LogHttpCacheData {
     companion object {
         /**

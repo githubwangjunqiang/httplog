@@ -3,6 +3,7 @@ package com.example.logcache
 import android.content.Context
 import android.hardware.*
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -80,5 +81,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
     }
 
     override fun onFlushCompleted(sensor: Sensor?) {
+    }
+
+    override fun onDestroy() {
+        Log.d("12345", "onDestroy: MainActivity")
+        super.onDestroy()
     }
 }
