@@ -37,8 +37,8 @@ object LogCacheManager : ILogCacheManager {
 
         launchJob.launch(Dispatchers.IO) {
             val logCounts = getLogCounts()
-            if (logCounts > 10) {
-                LogDBHelper.singleton.deleteCount(5)
+            if (logCounts > 500) {
+                LogDBHelper.singleton.deleteCount(200)
             }
 
         }
