@@ -1,4 +1,4 @@
-package com.xq.app.cachelog.utils
+package com.example.logcache
 
 import com.xq.app.cachelog.LogCacheManager
 import com.xq.app.cachelog.entiy.LogHttpCacheData
@@ -12,10 +12,9 @@ import java.util.concurrent.TimeUnit
  * @user Android - 小强
  * @mailbox 980766134@qq.com
  */
-class LoggingInterceptor : Interceptor {
+class LogCacheInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val logData = LogHttpCacheData()
-        logData.startTime = System.currentTimeMillis()
+        val logData = LogHttpCacheData(System.currentTimeMillis())
         logData.userId = LogCacheManager.userId
         val request = chain.request()
 

@@ -23,7 +23,7 @@ object LogCacheManager : ILogCacheManager {
     /**
      * 缓存所用协程
      */
-    private var launchJob = GlobalScope
+    private var launchJob = MainScope()
 
     /**
      * 初始化时间  也作为此次进程所有日志保存的文件夹
@@ -33,11 +33,20 @@ object LogCacheManager : ILogCacheManager {
         this.context = context.applicationContext
         this.userId = userId
         initTime = System.currentTimeMillis()
+
+
+        launchJob.launch(Dispatchers.IO) {
+            val logCounts = getLogCounts()
+            if (logCounts > 10) {
+                LogDBHelper.singleton.deleteCount(5)
+            }
+
+        }
+
     }
 
     override fun saveLoadLog(logDataCacheData: LogHttpCacheData?) {
         logDataCacheData?.let {
-            it.logId = System.currentTimeMillis()
             launchJob.launch(Dispatchers.IO) {
                 try {
                     LogDBHelper.singleton.addLogData(it)

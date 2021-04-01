@@ -98,7 +98,6 @@ class LogDBHelper : SQLiteOpenHelper {
             if (rawQuery.moveToFirst()) {
                 count = rawQuery.getLong(0)
             }
-
             Log.d("12345", "loadDataCount: $count")
         } catch (e: Exception) {
             e.printStackTrace()
@@ -108,5 +107,76 @@ class LogDBHelper : SQLiteOpenHelper {
         }
     }
 
+    /**
+     * 组合删除指定日期的数据
+     */
+    suspend fun deleteCount(count: Long) {
+        var rawQuery: Cursor? = null
+        writableDatabase.beginTransaction()
+        try {
+            val queryFistID = queryForIndex(count)
+            queryFistID?.run {
+                deleteLessThan(this)
+            }
+            writableDatabase.setTransactionSuccessful()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            rawQuery?.close()
+            writableDatabase.endTransaction()
+        }
+
+
+    }
+
+    /**
+     * 查询第一条id
+     */
+    suspend fun queryForIndex(index: Long): String? {
+        var rawQuery: Cursor? = null
+        var logIds: String? = null
+        try {
+            rawQuery =
+                writableDatabase.query(
+                    LogHttpCacheData.TABLE_NAME,
+                    arrayOf(LogHttpCacheData.logId_key),
+                    null, null, null, null, null, "$index,1"
+                )
+
+            if (rawQuery?.moveToFirst() == true) {
+                val logId: Long = rawQuery?.loadLong(LogHttpCacheData.logId_key)
+                logIds = if (logId == 0L) null else logId.toString()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            rawQuery?.close()
+            return logIds
+        }
+    }
+
+    /**
+     * 删除id 小于指定行的
+     * @param logId  行 id
+     */
+    suspend fun deleteLessThan(logId: String): Boolean {
+        var success = false
+        try {
+
+            val count = writableDatabase.delete(
+                LogHttpCacheData.TABLE_NAME,
+                "${LogHttpCacheData.logId_key}<?",
+                arrayOf(logId)
+            )
+            Log.d("12345", "delete: $count")
+            if (count == 1) {
+                success = true
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return success
+    }
 
 }

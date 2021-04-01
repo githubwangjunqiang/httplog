@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.xq.app.cachelog.LogCacheManager
-import com.xq.app.cachelog.utils.LoggingInterceptor
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.FormBody
@@ -29,7 +28,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
     private var mMagneticField: Sensor? = null
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
-            .addNetworkInterceptor(LoggingInterceptor())
+            .addNetworkInterceptor(LogCacheInterceptor())
             .build()
     }
 

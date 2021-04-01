@@ -97,11 +97,9 @@ class LogViewHolder(val view: View) : LogBaseAdapter(view) {
     val tvContent: TextView = view.findViewById(R.id.item_tvcontent)
     override fun setData(listData: ListData, position: Int, loading: (() -> Unit)?) {
         super.setData(listData, position, loading)
-        tvContent.text = "接口存入时间：${listData.data?.logId.format()}"
+        tvContent.text = "接口请求时间：${listData.data?.logId.format()}"
         tvContent.append("\n")
         tvContent.append("URL：${listData.data?.url}")
-        tvContent.append("\n")
-        tvContent.append("请求时间：${listData.data?.startTime.format()}")
         tvContent.append("\n")
         tvContent.append("userId：${listData.data?.userId}")
         tvContent.append("\n")

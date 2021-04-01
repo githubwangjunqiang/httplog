@@ -4,7 +4,12 @@ import android.content.ContentValues
 import androidx.annotation.Keep
 
 @Keep
-open class LogHttpCacheData {
+data class LogHttpCacheData(
+    /**
+     * 日志id标识付
+     */
+    var logId: Long
+) {
     companion object {
         /**
          * 表名称
@@ -16,10 +21,6 @@ open class LogHttpCacheData {
          */
         const val logId_key = "logId"
 
-        /**
-         * 请求时间 键
-         */
-        const val startTime_key = "startTime_key"
 
         /**
          * 用户标识 键
@@ -72,7 +73,6 @@ open class LogHttpCacheData {
          */
         const val TABLE_CREATE = "create table $TABLE_NAME (" +
                 "$logId_key INT PRIMARY KEY," +
-                "$startTime_key INT," +
                 "$userId_key TEXT," +
                 "$url_key TEXT," +
                 "$sendHead_key TEXT," +
@@ -87,20 +87,11 @@ open class LogHttpCacheData {
 
     }
 
-    /**
-     * 日志id标识付
-     */
-    var logId: Long = 0
 
     /**
      * 用户 标识
      */
     var userId: String? = null
-
-    /**
-     * 请求时间 毫秒值
-     */
-    var startTime: Long? = null
 
 
     /**
@@ -123,6 +114,7 @@ open class LogHttpCacheData {
      * 接口耗时  单位毫秒
      */
     var durration: String? = null
+
     /**
      * 接口返回http 状态码
      */
@@ -150,7 +142,6 @@ open class LogHttpCacheData {
         return ContentValues().apply {
             put(logId_key, logId)
             put(userId_key, userId)
-            put(startTime_key, startTime)
             put(url_key, url)
             put(sendHead_key, sendHead)
             put(sendParameter_key, sendParameter)
