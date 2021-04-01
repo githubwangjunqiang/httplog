@@ -1,9 +1,10 @@
 package com.xq.app.cachelog
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.Keep
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,8 +13,8 @@ import com.xq.app.cachelog.adapter.LogAdapter
 import com.xq.app.cachelog.entiy.ListData
 import com.xq.app.cachelog.entiy.LogHttpCacheData
 import kotlinx.coroutines.*
-import kotlin.math.max
 
+@Keep
 open class HttpLogActivity : AppCompatActivity() {
 
 

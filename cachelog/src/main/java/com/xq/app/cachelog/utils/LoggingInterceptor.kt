@@ -24,25 +24,18 @@ class LoggingInterceptor : Interceptor {
         logData.url = "${request.method}->$url"
         val sbHeader = StringBuilder()
         val headers = request.headers
-        var isIdentitySend = false
         headers.forEach {
             sbHeader.append(it.first).append("=").append(it.second).append("\n")
-            if ("Content-Encoding".equals(it.first, true)) {
-                isIdentitySend = "identity".equals(it.second, ignoreCase = true)
-            }
         }
         logData.sendHead = sbHeader.toString()
         sbHeader.delete(0, sbHeader.length)
         body?.run {
-            if (this is FormBody && isIdentitySend) {
+            if (this is FormBody) {
                 val buffer = Buffer()
                 this.writeTo(buffer)
                 val charset = this.contentType()?.charset(Charset.defaultCharset())
                     ?: Charset.defaultCharset()
                 var readString = buffer.readString(charset)
-                if (readString.length > 200) {
-                    readString = readString.subSequence(0, 200).toString()
-                }
                 logData.sendParameter = readString
             }
         }
