@@ -6,11 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.util.rangeTo
 import androidx.recyclerview.widget.RecyclerView
 import com.xq.app.cachelog.R
 import com.xq.app.cachelog.entiy.ListData
 import com.xq.app.cachelog.utils.format
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
@@ -18,8 +21,13 @@ import kotlinx.coroutines.launch
  * @user Android - 小强
  * @mailbox 980766134@qq.com
  */
-class LogAdapter(val context: Context, var mCoroutineScope: CoroutineScope, val loading: (() -> Unit)? = null) :
+class LogAdapter(
+    val context: Context,
+    var mCoroutineScope: CoroutineScope,
+    val loading: (() -> Unit)? = null
+) :
     RecyclerView.Adapter<LogBaseAdapter>() {
+    private var launchSearch: Job? = null
     private val layoutInflater = LayoutInflater.from(context)
     val list = mutableListOf<ListData>()
     var loadingStats = false
@@ -28,10 +36,6 @@ class LogAdapter(val context: Context, var mCoroutineScope: CoroutineScope, val 
      * 输入关键词
      */
     var keyword: String? = null
-
-
-
-
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogBaseAdapter {
@@ -103,11 +107,20 @@ class LogAdapter(val context: Context, var mCoroutineScope: CoroutineScope, val 
      * 设置关键词
      */
     fun processKeyWord(trim: String) {
-        keyword = trim
-
-        mCoroutineScope.launch {
-
-        }
+//        keyword = trim
+//        launchSearch?.cancel()
+//        launchSearch = mCoroutineScope.launch(Dispatchers.IO) {
+//            list.filter {
+//                if(it.itemType == ListData.ITEM_TYPE){
+//                    it.data?.run {
+//                        this.toString().contains(keyword!!,true)
+//                    }
+//                }else{
+//                    false
+//                }
+//
+//            }
+//        }
     }
 
 
