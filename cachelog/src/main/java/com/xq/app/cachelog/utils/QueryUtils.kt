@@ -4,6 +4,7 @@ import android.database.Cursor
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
 import com.xq.app.cachelog.entiy.LogHttpCacheData
+import java.text.SimpleDateFormat
 
 /**
  * @data 2021/3/31
@@ -17,6 +18,7 @@ fun Cursor.loadHttpLogData(): LogHttpCacheData {
     var data = LogHttpCacheData()
     data.logId = loadLong(LogHttpCacheData.logId_key)
     data.userId = loadString(LogHttpCacheData.userId_key)
+    data.url = loadString(LogHttpCacheData.url_key)
     data.durration = loadString(LogHttpCacheData.durration_key)
     data.startTime = loadLong(LogHttpCacheData.startTime_key)
     data.returnHeader = loadString(LogHttpCacheData.returnHeader_key)
@@ -48,4 +50,11 @@ fun Cursor.loadString(columnName: String): String? {
         return getStringOrNull(columnIndex)
     }
     return null
+}
+
+/**
+ * 格式化时间
+ */
+fun Long?.format(): String {
+    return SimpleDateFormat("yyyy-MM-dd-HH:mm:ss.SSSZ").format(this ?: 0)
 }

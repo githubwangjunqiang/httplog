@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.xq.app.cachelog.LogCacheManager
 import com.xq.app.cachelog.entiy.LogHttpCacheData
 import com.xq.app.cachelog.utils.loadHttpLogData
@@ -55,13 +56,14 @@ class LogDBHelper : SQLiteOpenHelper {
      * @param startIndex 从第几行开始
      * @param count  返回几行数据
      */
-    suspend fun loadLogDataList(startIndex: Long, count: Long): List<LogHttpCacheData> {
+    suspend fun loadLogDataList(startIndex: Long, count: Long): MutableList<LogHttpCacheData> {
         var query: Cursor? = null
         var listData = mutableListOf<LogHttpCacheData>()
         try {
             query = writableDatabase.query(
                 LogHttpCacheData.TABLE_NAME, null, null,
                 null, null, null, "${LogHttpCacheData.logId_key} desc",
+//                null, null, null, null,
                 "$startIndex,$count"
             )
             query?.let {
@@ -93,7 +95,11 @@ class LogDBHelper : SQLiteOpenHelper {
                     "select count(*)  from ${LogHttpCacheData.TABLE_NAME}",
                     null
                 )
-            count = rawQuery.count.toLong()
+            if (rawQuery.moveToFirst()) {
+                count = rawQuery.getLong(0)
+            }
+
+            Log.d("12345", "loadDataCount: $count")
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {

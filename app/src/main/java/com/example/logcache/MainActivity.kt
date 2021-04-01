@@ -4,8 +4,16 @@ import android.content.Context
 import android.hardware.*
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.xq.app.cachelog.LogCacheManager
+import com.xq.app.cachelog.utils.LoggingInterceptor
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener2 {
@@ -19,10 +27,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
     private var mSensorManager: SensorManager? = null
     private var mAccelerometer: Sensor? = null
     private var mMagneticField: Sensor? = null
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addNetworkInterceptor(LoggingInterceptor())
+            .build()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        LogCacheManager.initContext(this, "12345")
         img = findViewById(R.id.imageview)
 
 
@@ -42,6 +56,27 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
 //                Log.d("12345", "onSensorChanged-2:${values[2]} ")
 //            }
 //        }
+
+        img?.setOnClickListener {
+            GlobalScope.launch {
+                val newCall = okHttpClient.newCall(
+                    Request.Builder()
+                        .addHeader("cockroach", "requestHeader")
+                        .url("http://test.qushiwan.cn/imoney/app/api/system/v2/getVersionInfo")
+                        .post(
+                            FormBody.Builder()
+                                .add("channelCode", "itest")
+                                .build()
+                        )
+                        .build()
+                )
+                val execute = newCall.execute()
+                val string = execute.body?.string() ?: "返回是空的"
+                Log.d("12345", "请求接口返回了$string")
+
+            }
+        }
+
 
     }
 
@@ -86,5 +121,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
     override fun onDestroy() {
         Log.d("12345", "onDestroy: MainActivity")
         super.onDestroy()
+    }
+
+    fun doClickLog(view: View) {
+
+        LogCacheManager.showLogActivity(this)
     }
 }

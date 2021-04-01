@@ -4,7 +4,7 @@ import android.content.ContentValues
 import androidx.annotation.Keep
 
 @Keep
-class LogHttpCacheData {
+open class LogHttpCacheData {
     companion object {
         /**
          * 表名称
@@ -118,15 +118,15 @@ class LogHttpCacheData {
      */
     var sendParameter: String? = null
 
-    /**
-     * 接口返回http 状态码
-     */
-    var returnHttpCode: String? = null
 
     /**
      * 接口耗时  单位毫秒
      */
     var durration: String? = null
+    /**
+     * 接口返回http 状态码
+     */
+    var returnHttpCode: String? = null
 
     /**
      * 接口返回头

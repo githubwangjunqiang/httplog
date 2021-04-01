@@ -26,5 +26,10 @@ interface ILogCacheManager {
      */
     suspend fun getLogCounts(): Long
 
+    /**
+     * 显示日志
+     */
+    fun showLogActivity(context: Context)
+
 
 }
