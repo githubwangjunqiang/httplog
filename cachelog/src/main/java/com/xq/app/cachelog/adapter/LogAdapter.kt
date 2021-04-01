@@ -10,17 +10,29 @@ import androidx.recyclerview.widget.RecyclerView
 import com.xq.app.cachelog.R
 import com.xq.app.cachelog.entiy.ListData
 import com.xq.app.cachelog.utils.format
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * @data 2021/4/1
  * @user Android - 小强
  * @mailbox 980766134@qq.com
  */
-class LogAdapter(val context: Context, val loading: (() -> Unit)? = null) :
+class LogAdapter(val context: Context, var mCoroutineScope: CoroutineScope, val loading: (() -> Unit)? = null) :
     RecyclerView.Adapter<LogBaseAdapter>() {
     private val layoutInflater = LayoutInflater.from(context)
     val list = mutableListOf<ListData>()
     var loadingStats = false
+
+    /**
+     * 输入关键词
+     */
+    var keyword: String? = null
+
+
+
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogBaseAdapter {
         return when (viewType) {
@@ -60,10 +72,10 @@ class LogAdapter(val context: Context, val loading: (() -> Unit)? = null) :
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
-                when(newState){
-                    RecyclerView.SCROLL_STATE_IDLE->{
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
                         val canScrollVertically = recyclerView.canScrollVertically(1)
-                        if (!canScrollVertically  && !loadingStats) {
+                        if (!canScrollVertically && !loadingStats) {
                             loadingStats = true
                             loading?.invoke()
                         }
@@ -77,6 +89,25 @@ class LogAdapter(val context: Context, val loading: (() -> Unit)? = null) :
                 super.onScrolled(recyclerView, dx, dy)
             }
         })
+    }
+
+    /**
+     * 下一个
+     */
+    fun nextKeyWord() {
+
+
+    }
+
+    /**
+     * 设置关键词
+     */
+    fun processKeyWord(trim: String) {
+        keyword = trim
+
+        mCoroutineScope.launch {
+
+        }
     }
 
 
@@ -94,12 +125,12 @@ open class LogBaseAdapter : RecyclerView.ViewHolder {
 
 class LogViewHolder(val view: View) : LogBaseAdapter(view) {
 
+    val tvTitle: TextView = view.findViewById(R.id.item_tvtitle)
     val tvContent: TextView = view.findViewById(R.id.item_tvcontent)
     override fun setData(listData: ListData, position: Int, loading: (() -> Unit)?) {
         super.setData(listData, position, loading)
-        tvContent.text = "接口请求时间：${listData.data?.logId.format()}"
-        tvContent.append("\n")
-        tvContent.append("URL：${listData.data?.url}")
+        tvTitle.text = "${position + 1} - 接口时间：${listData.data?.logId.format()}"
+        tvContent.text = "URL：${listData.data?.url}"
         tvContent.append("\n")
         tvContent.append("userId：${listData.data?.userId}")
         tvContent.append("\n")

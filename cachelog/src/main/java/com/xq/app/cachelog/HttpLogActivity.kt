@@ -1,7 +1,12 @@
 package com.xq.app.cachelog
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
+import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
@@ -23,30 +28,104 @@ open class HttpLogActivity : AppCompatActivity() {
     private var logCounts: Long = 0
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var recyclerView: RecyclerView? = null
+    private var tvFilter: View? = null
+    private var btnNext: View? = null
+    private var btnPrevious: View? = null
+    private var etKeyword: EditText? = null
+    private var tvTitle: TextView? = null
+    private var ivLogo: ImageView? = null
+    private var tvCount: TextView? = null
     private var mLogAdapter: LogAdapter? = null
 
     private var jobRefresh: Job? = null
     private var jobLoading: Job? = null
+    private var mMainScope = MainScope()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_http_log)
+
+        initView()
+
+        setListener()
+
+
+        swipeRefreshLayout?.post {
+            swipeRefreshLayout?.isRefreshing = true
+            loadData()
+        }
+
+    }
+
+    /**
+     * 初始化 view
+     */
+    private fun initView() {
         swipeRefreshLayout = findViewById(R.id.xp_log_http_activity_swiperefreshlayout)
         recyclerView = findViewById(R.id.xp_log_http_activity_recyclerview)
-        mLogAdapter = LogAdapter(this) {
+        tvFilter = findViewById(R.id.xp_log_http_activity_filter)
+        tvTitle = findViewById(R.id.xp_log_http_activity_tvtitle)
+        tvCount = findViewById(R.id.xp_log_http_activity_tvcount)
+        ivLogo = findViewById(R.id.xp_log_http_activity_ivlogo)
+        etKeyword = findViewById(R.id.xp_log_http_activity_etsearch)
+        btnNext = findViewById(R.id.xp_log_http_activity_tvnext)
+        btnPrevious = findViewById(R.id.xp_log_http_activity_tvprevious)
+
+
+
+        mLogAdapter = LogAdapter(this, mMainScope) {
             loadMoreData()
         }
         recyclerView?.layoutManager = LinearLayoutManager(this)
         recyclerView?.adapter = mLogAdapter
         recyclerView?.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
+
+        try {
+            this.applicationContext?.packageManager?.run {
+                this.getApplicationIcon(packageName)?.let {
+                    ivLogo?.setImageDrawable(it)
+                }
+                this.getApplicationInfo(packageName, 0)?.let {
+                    val string = resources.getString(it.labelRes)
+                    tvTitle?.text = string
+                }
+            }
+        } catch (e: Exception) {
+        }
+    }
+
+    /**
+     * 设置监听器
+     */
+    private fun setListener() {
         swipeRefreshLayout?.setOnRefreshListener {
             loadData()
         }
 
-        swipeRefreshLayout?.post {
-            swipeRefreshLayout?.isRefreshing = true
-            loadData()
+        //下一个
+        btnNext?.setOnClickListener {
+            val trim = etKeyword?.text.toString().trim()
+
+            if (TextUtils.isEmpty(mLogAdapter?.keyword)) {
+                if (!TextUtils.isEmpty(trim)) {
+                    mLogAdapter?.processKeyWord(trim)
+                }
+            } else {
+                if (trim.equals(mLogAdapter?.keyword, true)) {
+                    //下一个
+                    mLogAdapter?.nextKeyWord()
+                } else {
+                    mLogAdapter?.processKeyWord(trim)
+                }
+            }
+
+
+        }
+        //上一个
+        btnPrevious?.setOnClickListener {
+
         }
 
     }
@@ -62,7 +141,7 @@ open class HttpLogActivity : AppCompatActivity() {
                 var index = 0L
                 index = if (startIndex - count <= 0) {
                     0
-                }else{
+                } else {
                     startIndex - count
                 }
                 var counts = if (index == 0L) startIndex else count
@@ -128,6 +207,8 @@ open class HttpLogActivity : AppCompatActivity() {
                     it.loadingStats = false
                 }
             }
+            tvCount?.text =
+                "T:$logCounts, s:$startIndex, c:${mLogAdapter?.list?.filter { it.itemType == ListData.ITEM_TYPE }?.size}"
         }
 
 
@@ -155,6 +236,8 @@ open class HttpLogActivity : AppCompatActivity() {
                 }
 
             }
+            tvCount?.text =
+                "T:$logCounts, s:$startIndex, c:${mLogAdapter?.list?.filter { it.itemType == ListData.ITEM_TYPE }?.size}"
         }
 
 

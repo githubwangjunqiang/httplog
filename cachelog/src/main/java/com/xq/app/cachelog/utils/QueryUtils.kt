@@ -54,5 +54,5 @@ fun Cursor.loadString(columnName: String): String? {
  * 格式化时间
  */
 fun Long?.format(): String {
-    return SimpleDateFormat("yyyy-MM-dd-HH:mm:ss.SSSZ").format(this ?: 0)
+    return SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(this ?: 0)
 }

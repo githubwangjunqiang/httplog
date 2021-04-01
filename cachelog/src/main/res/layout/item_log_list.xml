@@ -5,11 +5,24 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/item_tvtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:text="请求时间:"
+        android:textColor="#222222"
+        android:textIsSelectable="true"
+        android:textSize="16dp" />
+
+    <TextView
         android:id="@+id/item_tvcontent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="请求接口时间"
-        android:textIsSelectable="true" />
+        android:textIsSelectable="true"
+        android:textSize="14dp" />
 
 </LinearLayout>
