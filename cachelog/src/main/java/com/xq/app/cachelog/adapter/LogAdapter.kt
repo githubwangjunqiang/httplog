@@ -176,12 +176,11 @@ class LogAdapter(
         launchSearch = mCoroutineScope.launch(Dispatchers.IO) {
             list.forEach {
                 if (it.itemType == ListData.ITEM_TYPE) {
-                    val add = it.data?.run {
-                        val contains = this.toString().contains(keyword!!, true)
-                        contains
-                    } ?: false
-                    if (add) {
-                        filter.add(it)
+                    it.data?.run {
+                        val contains = this.url?.contains(keyword!!, true) ?: false
+                        if (contains) {
+                            filter.add(it)
+                        }
                     }
                 }
             }
