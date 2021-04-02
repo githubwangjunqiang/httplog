@@ -1,16 +1,17 @@
 package com.xq.app.cachelog.adapter
 
 import android.content.Context
-import android.util.Log
+import android.graphics.Color
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.util.rangeTo
 import androidx.recyclerview.widget.RecyclerView
 import com.xq.app.cachelog.R
 import com.xq.app.cachelog.entiy.ListData
 import com.xq.app.cachelog.utils.format
+import com.xq.app.cachelog.utils.show
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,7 +28,9 @@ class LogAdapter(
     val loading: (() -> Unit)? = null
 ) :
     RecyclerView.Adapter<LogBaseAdapter>() {
+    private var filter = mutableListOf<ListData>()
     private var launchSearch: Job? = null
+    private var recyclerView: RecyclerView? = null
     private val layoutInflater = LayoutInflater.from(context)
     val list = mutableListOf<ListData>()
     var loadingStats = false
@@ -37,6 +40,11 @@ class LogAdapter(
      */
     var keyword: String? = null
 
+    /**
+     * 关键词开始下标 点击下一个 或者上一个的时候 依靠此值
+     */
+    var indexKerWord = 0
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogBaseAdapter {
         return when (viewType) {
@@ -45,7 +53,7 @@ class LogAdapter(
                     R.layout.item_log_list,
                     parent,
                     false
-                )
+                ), filter
             )
             else -> loadingViewHolder(
                 layoutInflater.inflate(
@@ -71,7 +79,7 @@ class LogAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        val scrollState = recyclerView.scrollState
+        this.recyclerView = recyclerView
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -99,6 +107,55 @@ class LogAdapter(
      * 下一个
      */
     fun nextKeyWord() {
+        mCoroutineScope.launch(Dispatchers.Main) {
+            if (filter.isEmpty()) {
+                "没有搜到关键词".show()
+                return@launch
+            }
+            indexKerWord++
+            if (indexKerWord >= filter.size) {
+                indexKerWord = filter.size - 1
+                "已经是最后一个了".show()
+            } else {
+                val listData = filter[indexKerWord]
+                val indexOf = list.indexOf(listData)
+                if (indexOf == -1) {
+                    "没有找到位置".show()
+                    return@launch
+                }
+                recyclerView?.smoothScrollToPosition(indexOf)
+                notifyItemChanged(indexOf)
+            }
+
+        }
+
+
+    }
+
+    /**
+     * 上一个
+     */
+    fun previousKeyWord() {
+        mCoroutineScope.launch(Dispatchers.Main) {
+            if (filter.isEmpty()) {
+                "没有搜到关键词".show()
+                return@launch
+            }
+            indexKerWord--
+            if (indexKerWord < 0) {
+                indexKerWord = 0
+                "已经是第一个了".show()
+            } else {
+                val indexOf = list.indexOf(filter[indexKerWord])
+                if (indexOf == -1) {
+                    "没有找到位置".show()
+                    return@launch
+                }
+                recyclerView?.smoothScrollToPosition(indexOf)
+                notifyItemChanged(indexOf)
+            }
+
+        }
 
 
     }
@@ -107,20 +164,34 @@ class LogAdapter(
      * 设置关键词
      */
     fun processKeyWord(trim: String) {
-//        keyword = trim
-//        launchSearch?.cancel()
-//        launchSearch = mCoroutineScope.launch(Dispatchers.IO) {
-//            list.filter {
-//                if(it.itemType == ListData.ITEM_TYPE){
-//                    it.data?.run {
-//                        this.toString().contains(keyword!!,true)
-//                    }
-//                }else{
-//                    false
-//                }
-//
-//            }
-//        }
+        filter?.clear()
+        notifyDataSetChanged()
+        indexKerWord = -1
+        keyword = trim
+        if (TextUtils.isEmpty(trim)) {
+            "关键词为空".show()
+            return
+        }
+        launchSearch?.cancel()
+        launchSearch = mCoroutineScope.launch(Dispatchers.IO) {
+            list.forEach {
+                if (it.itemType == ListData.ITEM_TYPE) {
+                    val add = it.data?.run {
+                        val contains = this.toString().contains(keyword!!, true)
+                        contains
+                    } ?: false
+                    if (add) {
+                        filter.add(it)
+                    }
+                }
+            }
+            if (filter.isNullOrEmpty()) {
+                "没有搜到关键词".show()
+                return@launch
+            }
+
+            nextKeyWord()
+        }
     }
 
 
@@ -136,12 +207,19 @@ open class LogBaseAdapter : RecyclerView.ViewHolder {
     }
 }
 
-class LogViewHolder(val view: View) : LogBaseAdapter(view) {
+class LogViewHolder(view: View, val filter: MutableList<ListData>) : LogBaseAdapter(view) {
 
     val tvTitle: TextView = view.findViewById(R.id.item_tvtitle)
     val tvContent: TextView = view.findViewById(R.id.item_tvcontent)
     override fun setData(listData: ListData, position: Int, loading: (() -> Unit)?) {
         super.setData(listData, position, loading)
+        tvTitle.setTextColor(
+            if (filter.contains(listData)) {
+                Color.RED
+            } else {
+                Color.parseColor("#222222")
+            }
+        )
         tvTitle.text = "${position + 1} - 接口时间：${listData.data?.logId.format()}"
         tvContent.text = "URL：${listData.data?.url}"
         tvContent.append("\n")

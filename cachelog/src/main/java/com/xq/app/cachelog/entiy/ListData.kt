@@ -40,4 +40,5 @@ class ListData {
      */
     var loadStats: Int = UN_LOAD_STATS
 
+
 }

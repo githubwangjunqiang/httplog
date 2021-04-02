@@ -1,5 +1,8 @@
 package com.xq.app.cachelog
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -17,6 +20,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.xq.app.cachelog.adapter.LogAdapter
 import com.xq.app.cachelog.entiy.ListData
 import com.xq.app.cachelog.entiy.LogHttpCacheData
+import com.xq.app.cachelog.utils.closeKeyBord
+import com.xq.app.cachelog.utils.dp
+import com.xq.app.cachelog.utils.show
 import kotlinx.coroutines.*
 
 @Keep
@@ -31,6 +37,8 @@ open class HttpLogActivity : AppCompatActivity() {
     private var tvFilter: View? = null
     private var btnNext: View? = null
     private var btnPrevious: View? = null
+    private var searchIcon: View? = null
+    private var etRoot: View? = null
     private var etKeyword: EditText? = null
     private var tvTitle: TextView? = null
     private var ivLogo: ImageView? = null
@@ -40,6 +48,7 @@ open class HttpLogActivity : AppCompatActivity() {
     private var jobRefresh: Job? = null
     private var jobLoading: Job? = null
     private var mMainScope = MainScope()
+    private val animatorSet = AnimatorSet()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +64,14 @@ open class HttpLogActivity : AppCompatActivity() {
             swipeRefreshLayout?.isRefreshing = true
             loadData()
         }
+        etRoot?.post {
+            etRoot?.run {
+                this.translationX = this.width.toFloat()
+                searchIcon?.translationX = this.width.toFloat()
+            }
+
+        }
+
 
     }
 
@@ -71,6 +88,8 @@ open class HttpLogActivity : AppCompatActivity() {
         etKeyword = findViewById(R.id.xp_log_http_activity_etsearch)
         btnNext = findViewById(R.id.xp_log_http_activity_tvnext)
         btnPrevious = findViewById(R.id.xp_log_http_activity_tvprevious)
+        searchIcon = findViewById(R.id.xp_log_http_activity_etsearch_icon)
+        etRoot = findViewById(R.id.xp_log_http_activity_etroot)
 
 
 
@@ -106,11 +125,14 @@ open class HttpLogActivity : AppCompatActivity() {
 
         //下一个
         btnNext?.setOnClickListener {
+            etKeyword?.closeKeyBord()
             val trim = etKeyword?.text.toString().trim()
 
             if (TextUtils.isEmpty(mLogAdapter?.keyword)) {
                 if (!TextUtils.isEmpty(trim)) {
                     mLogAdapter?.processKeyWord(trim)
+                } else {
+                    "关键词为空".show()
                 }
             } else {
                 if (trim.equals(mLogAdapter?.keyword, true)) {
@@ -121,11 +143,43 @@ open class HttpLogActivity : AppCompatActivity() {
                 }
             }
 
-
         }
         //上一个
         btnPrevious?.setOnClickListener {
-
+            etKeyword?.closeKeyBord()
+            mLogAdapter?.previousKeyWord()
+        }
+        //搜索图标
+        searchIcon?.setOnClickListener {
+            etKeyword?.closeKeyBord()
+            animatorSet.cancel()
+            val left = etRoot?.translationX ?: 0F
+            if (left <= 0F) {
+                val apply =
+                    ValueAnimator.ofFloat(left, etRoot!!.width.toFloat())
+                        .apply {
+                            duration = 300
+                            addUpdateListener {
+                                val animatedValue = it.animatedValue
+                                etRoot?.translationX = animatedValue as Float
+                                searchIcon?.translationX = animatedValue
+                            }
+                        }
+                animatorSet.play(apply)
+                animatorSet.start()
+            } else {
+                val apply =
+                    ValueAnimator.ofFloat(left, 0F).apply {
+                        duration = 300
+                        addUpdateListener {
+                            val animatedValue = it.animatedValue
+                            etRoot?.translationX = animatedValue as Float
+                            searchIcon?.translationX = animatedValue
+                        }
+                    }
+                animatorSet.play(apply)
+                animatorSet.start()
+            }
         }
 
     }
@@ -246,6 +300,8 @@ open class HttpLogActivity : AppCompatActivity() {
     override fun onDestroy() {
         jobLoading?.cancel()
         jobRefresh?.cancel()
+        mMainScope?.cancel()
+        animatorSet?.cancel()
         super.onDestroy()
     }
 }

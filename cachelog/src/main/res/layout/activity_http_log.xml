@@ -69,45 +69,68 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <Button
-        android:id="@+id/xp_log_http_activity_tvprevious"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:background="#8087C86B"
-        android:minWidth="10dp"
-        android:minHeight="10dp"
-        android:padding="10dp"
-        android:text="上一个"
-        app:layout_constraintBottom_toTopOf="@+id/xp_log_http_activity_etsearch"
-        app:layout_constraintEnd_toEndOf="@+id/xp_log_http_activity_etsearch" />
-
-    <EditText
-        android:id="@+id/xp_log_http_activity_etsearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/xp_log_http_activity_etsearch_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginEnd="10dp"
-        android:background="#80FFFFFF"
-        android:hint="请输入关键字"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:background="@drawable/ic_baseline_search_24_back"
+        android:padding="5dp"
+        android:src="@drawable/ic_baseline_search_24"
+        app:layout_constraintBottom_toBottomOf="@+id/xp_log_http_activity_etroot"
+        app:layout_constraintEnd_toStartOf="@+id/xp_log_http_activity_etroot"
+        app:layout_constraintTop_toTopOf="@+id/xp_log_http_activity_etroot"
+        app:tint="#ffffff" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/xp_log_http_activity_etroot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
 
-    <Button
-        android:id="@+id/xp_log_http_activity_tvnext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="#8087C86B"
-        android:minWidth="10dp"
-        android:minHeight="10dp"
-        android:padding="10dp"
-        android:text="下一个"
-        app:layout_constraintEnd_toEndOf="@+id/xp_log_http_activity_etsearch"
-        app:layout_constraintTop_toBottomOf="@+id/xp_log_http_activity_etsearch" />
+        <Button
+            android:id="@+id/xp_log_http_activity_tvprevious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="#8087C86B"
+            android:minWidth="10dp"
+            android:minHeight="10dp"
+            android:padding="10dp"
+            android:text="上一个"
+            app:layout_constraintBottom_toTopOf="@+id/xp_log_http_activity_etsearch"
+            app:layout_constraintEnd_toEndOf="@+id/xp_log_http_activity_etsearch" />
 
+        <EditText
+            android:id="@+id/xp_log_http_activity_etsearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="#80FFC107"
+            android:hint="请输入关键字"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <Button
+            android:id="@+id/xp_log_http_activity_tvnext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="#8087C86B"
+            android:minWidth="10dp"
+            android:minHeight="10dp"
+            android:padding="10dp"
+            android:text="下一个"
+            app:layout_constraintEnd_toEndOf="@+id/xp_log_http_activity_etsearch"
+            app:layout_constraintTop_toBottomOf="@+id/xp_log_http_activity_etsearch" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
