@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.xq.app.cachelog.R
 import com.xq.app.cachelog.entiy.ListData
@@ -123,7 +124,14 @@ class LogAdapter(
                     "没有找到位置".show()
                     return@launch
                 }
-                recyclerView?.smoothScrollToPosition(indexOf)
+                recyclerView?.let {
+                    it.layoutManager?.run {
+                        val linearLayoutManager = this as LinearLayoutManager
+                        linearLayoutManager.scrollToPositionWithOffset(indexOf, 0)
+                        linearLayoutManager
+                    }
+                }
+//                recyclerView?.smoothScrollToPosition(indexOf)
                 notifyItemChanged(indexOf)
             }
 
@@ -151,7 +159,14 @@ class LogAdapter(
                     "没有找到位置".show()
                     return@launch
                 }
-                recyclerView?.smoothScrollToPosition(indexOf)
+                recyclerView?.let {
+                    it.layoutManager?.run {
+                        val linearLayoutManager = this as LinearLayoutManager
+                        linearLayoutManager.scrollToPositionWithOffset(indexOf, 0)
+                        linearLayoutManager
+                    }
+                }
+//                recyclerView?.smoothScrollToPosition(indexOf)
                 notifyItemChanged(indexOf)
             }
 
