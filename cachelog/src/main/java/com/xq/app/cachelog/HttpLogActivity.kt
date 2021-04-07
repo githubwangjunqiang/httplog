@@ -59,11 +59,11 @@ open class HttpLogActivity : AppCompatActivity() {
 
         setListener()
 
-
         swipeRefreshLayout?.post {
             swipeRefreshLayout?.isRefreshing = true
             loadData()
         }
+
         etRoot?.post {
             etRoot?.run {
                 this.translationX = this.width.toFloat()
@@ -71,7 +71,6 @@ open class HttpLogActivity : AppCompatActivity() {
             }
 
         }
-
 
     }
 
@@ -274,6 +273,10 @@ open class HttpLogActivity : AppCompatActivity() {
     private fun addData(logs: List<LogHttpCacheData>?) {
         Log.d("12345", "addData: ${logs?.size}")
         runOnUiThread {
+            if (logs.isNullOrEmpty()) {
+                "没有数据了".show()
+                return@runOnUiThread
+            }
             mLogAdapter?.let {
                 val mutableListOf = mutableListOf<ListData>()
                 logs?.forEach {

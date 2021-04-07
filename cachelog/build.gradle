@@ -36,12 +36,26 @@ android {
                 if (f != null && f.endsWith('.aar')) {
                     def fileName = "xp_cache_http_log_v${defaultConfig.versionName}_v${defaultConfig.versionCode}.aar"
                     output.outputFileName = fileName
+                    def path = output.outputFile.path
+                    println("aar-:aarPath:" + path)
+                    println("aar-:aar_file_path:" + rootProject.aar_file_path)
+                    rootProject.aar_file_path = path
+                    println("aar-:aar_file_path2:" + rootProject.aar_file_path)
                 }
             }
         }
     }
 }
 
+task copyAARPath(type: Copy) {
+
+
+    println("aar-:开始复制aar")
+    println("aar-:aar的原路径：" + rootProject.aar_file_path)
+    from(rootProject.aar_file_path)
+    println("aar-:aar的现路径：aar")
+    into("aar")
+}
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
