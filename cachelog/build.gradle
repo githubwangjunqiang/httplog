@@ -50,10 +50,10 @@ android {
 task copyAARPath(type: Copy) {
 
 
-    println("aar-:开始复制aar")
-    println("aar-:aar的原路径：" + rootProject.aar_file_path)
-    from(rootProject.aar_file_path)
-    println("aar-:aar的现路径：aar")
+    println("aar-:start copying aar")
+    println("aar-:the-original-path-of-aar：" + rootProject.aar_file_path)
+    from("E:\\androidstudio\\work\\LogCache\\cachelog\\build\\outputs\\aar")
+    println("aar-:aar-s-current-path：aar")
     into("aar")
 }
 dependencies {
@@ -62,9 +62,9 @@ dependencies {
     api 'androidx.core:core-ktx:1.3.2'
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    api 'androidx.appcompat:appcompat:1.2.0'
+    api 'androidx.constraintlayout:constraintlayout:2.0.4'
+    api 'androidx.recyclerview:recyclerview:1.1.0'
+    api "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
 }

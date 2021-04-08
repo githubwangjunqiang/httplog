@@ -1,6 +1,7 @@
 package com.example.logcache
 
 import android.content.Context
+import android.content.Intent
 import android.hardware.*
 import android.os.Bundle
 import android.util.Log
@@ -125,5 +126,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
     fun doClickLog(view: View) {
 
         LogCacheManager.showLogActivity(this)
+    }
+
+    fun doClickProvider(view: View) {
+
+        startActivity(Intent(this, ContentProviderActivity::class.java))
     }
 }
