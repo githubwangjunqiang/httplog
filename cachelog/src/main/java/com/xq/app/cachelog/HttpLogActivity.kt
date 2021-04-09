@@ -3,6 +3,7 @@ package com.xq.app.cachelog
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.Keep
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,17 +31,30 @@ import kotlinx.coroutines.*
 open class HttpLogActivity : AppCompatActivity() {
 
 
+    private val etDialog: AlertDialog by lazy {
+        var dialogView = EditText(this).apply {
+            hint = "请输入关键字"
+            setPadding(20, 20, 20, 20)
+            minWidth = 200
+        }
+        AlertDialog.Builder(this)
+            .setTitle("请输入接口名称")
+            .setView(dialogView)
+            .setPositiveButton("确定") { _, _ ->
+                val trim = dialogView.text.toString().trim()
+                searchForTheKeyword(trim)
+            }
+            .setNegativeButton("取消") { dialog, _ ->
+                dialog.cancel()
+            }
+            .create()
+    }
     private var count: Long = 100
     private var startIndex: Long = 0
     private var logCounts: Long = 0
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var recyclerView: RecyclerView? = null
     private var tvFilter: View? = null
-    private var btnNext: View? = null
-    private var btnPrevious: View? = null
-    private var searchIcon: View? = null
-    private var etRoot: View? = null
-    private var etKeyword: EditText? = null
     private var tvTitle: TextView? = null
     private var ivLogo: ImageView? = null
     private var tvCount: TextView? = null
@@ -48,7 +63,6 @@ open class HttpLogActivity : AppCompatActivity() {
     private var jobRefresh: Job? = null
     private var jobLoading: Job? = null
     private var mMainScope = MainScope()
-    private val animatorSet = AnimatorSet()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,13 +78,6 @@ open class HttpLogActivity : AppCompatActivity() {
             loadData()
         }
 
-        etRoot?.post {
-            etRoot?.run {
-                this.translationX = this.width.toFloat()
-                searchIcon?.translationX = this.width.toFloat()
-            }
-
-        }
 
     }
 
@@ -84,11 +91,6 @@ open class HttpLogActivity : AppCompatActivity() {
         tvTitle = findViewById(R.id.xp_log_http_activity_tvtitle)
         tvCount = findViewById(R.id.xp_log_http_activity_tvcount)
         ivLogo = findViewById(R.id.xp_log_http_activity_ivlogo)
-        etKeyword = findViewById(R.id.xp_log_http_activity_etsearch)
-        btnNext = findViewById(R.id.xp_log_http_activity_tvnext)
-        btnPrevious = findViewById(R.id.xp_log_http_activity_tvprevious)
-        searchIcon = findViewById(R.id.xp_log_http_activity_etsearch_icon)
-        etRoot = findViewById(R.id.xp_log_http_activity_etroot)
 
 
 
@@ -121,66 +123,35 @@ open class HttpLogActivity : AppCompatActivity() {
         swipeRefreshLayout?.setOnRefreshListener {
             loadData()
         }
-
-        //下一个
-        btnNext?.setOnClickListener {
-            etKeyword?.closeKeyBord()
-            val trim = etKeyword?.text.toString().trim()
-
-            if (TextUtils.isEmpty(mLogAdapter?.keyword)) {
-                if (!TextUtils.isEmpty(trim)) {
-                    mLogAdapter?.processKeyWord(trim)
-                } else {
-                    "关键词为空".show()
-                }
-            } else {
-                if (trim.equals(mLogAdapter?.keyword, true)) {
-                    //下一个
-                    mLogAdapter?.nextKeyWord()
-                } else {
-                    mLogAdapter?.processKeyWord(trim)
-                }
-            }
-
+        tvFilter?.setOnClickListener {
+            //筛选
+            etDialog.show()
         }
-        //上一个
-        btnPrevious?.setOnClickListener {
-            etKeyword?.closeKeyBord()
-            mLogAdapter?.previousKeyWord()
-        }
-        //搜索图标
-        searchIcon?.setOnClickListener {
-            etKeyword?.closeKeyBord()
-            animatorSet.cancel()
-            val left = etRoot?.translationX ?: 0F
-            if (left <= 0F) {
-                val apply =
-                    ValueAnimator.ofFloat(left, etRoot!!.width.toFloat())
-                        .apply {
-                            duration = 300
-                            addUpdateListener {
-                                val animatedValue = it.animatedValue
-                                etRoot?.translationX = animatedValue as Float
-                                searchIcon?.translationX = animatedValue
-                            }
-                        }
-                animatorSet.play(apply)
-                animatorSet.start()
-            } else {
-                val apply =
-                    ValueAnimator.ofFloat(left, 0F).apply {
-                        duration = 300
-                        addUpdateListener {
-                            val animatedValue = it.animatedValue
-                            etRoot?.translationX = animatedValue as Float
-                            searchIcon?.translationX = animatedValue
-                        }
+
+
+    }
+
+    /**
+     * 显示 筛选对话框
+     */
+    private fun searchForTheKeyword(text: String) {
+        if (!TextUtils.isEmpty(text)) {
+            mMainScope.launch(Dispatchers.IO) {
+                mLogAdapter?.let {
+                    val filter = it.list.filter { data ->
+                        data.data?.url?.contains(text, true) == true
                     }
-                animatorSet.play(apply)
-                animatorSet.start()
+                    if (filter.isNullOrEmpty()) {
+                        "没有找到相关数据".show()
+                    } else {
+                        HttpLogFilterActivity.startActivity(this@HttpLogActivity, filter)
+                    }
+                }
             }
-        }
 
+        } else {
+            "关键词为空".show()
+        }
     }
 
     private fun loadMoreData() {
@@ -304,7 +275,6 @@ open class HttpLogActivity : AppCompatActivity() {
         jobLoading?.cancel()
         jobRefresh?.cancel()
         mMainScope?.cancel()
-        animatorSet?.cancel()
         super.onDestroy()
     }
 }

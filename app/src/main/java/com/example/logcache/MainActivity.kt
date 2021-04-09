@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.hardware.*
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.xq.app.cachelog.LogCacheManager
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
@@ -35,7 +37,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window?.decorView?.apply {
+            systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN and
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE and
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        }
         setContentView(R.layout.activity_main)
+
         LogCacheManager.initContext(this, "12345")
         img = findViewById(R.id.imageview)
 
@@ -131,5 +139,33 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
     fun doClickProvider(view: View) {
 
         startActivity(Intent(this, ContentProviderActivity::class.java))
+    }
+
+    private val myCoroutine = MyCo()
+
+    fun testYourOwnCoroutine(view: View) {
+
+
+        val launch = myCoroutine.launch {
+            Log.d("12345", "testYourOwnCoroutine:start-5000 ,th=${Thread.currentThread().name}")
+            delay(5000)
+            Log.d("12345", "testYourOwnCoroutine:5000 ,th=${Thread.currentThread().name}")
+        }
+        val launch1 = myCoroutine.launch {
+            Log.d("12345", "testYourOwnCoroutine:start-7000 ,th=${Thread.currentThread().name}")
+            delay(7000)
+            Log.d("12345", "testYourOwnCoroutine:7000  ,th=${Thread.currentThread().name}")
+        }
+        val launch2 = myCoroutine.launch {
+            Log.d("12345", "testYourOwnCoroutine:start-3000 ,th=${Thread.currentThread().name}")
+            delay(3000)
+            Log.d("12345", "testYourOwnCoroutine:3000  ,th=${Thread.currentThread().name}")
+        }
+
+        Log.d("12345", "testYourOwnCoroutine:over  ,th=${Thread.currentThread().name}")
+        launch.cancel()
+        Log.d("12345", "testYourOwnCoroutine:cancel  ,th=${Thread.currentThread().name}")
+
+
     }
 }
