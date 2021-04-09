@@ -10,9 +10,11 @@
         android:id="@+id/xp_log_http_activity_tvtit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#B92D6FF4"
         android:padding="10dp"
-        android:textColor="#333333"
-        android:textSize="16dp"
+        android:text="哈喽"
+        android:textColor="#ffffff"
+        android:textSize="14dp"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView

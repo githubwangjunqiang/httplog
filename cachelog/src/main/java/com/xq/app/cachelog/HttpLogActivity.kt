@@ -146,7 +146,7 @@ open class HttpLogActivity : AppCompatActivity() {
                     } else {
                         HttpLogFilterActivity.startActivity(
                             this@HttpLogActivity,
-                            filter, text
+                            filter, text, it.list.size.toString()
                         )
                     }
                 }

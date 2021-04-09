@@ -25,10 +25,11 @@ open class HttpLogFilterActivity : AppCompatActivity() {
     companion object {
         fun startActivity(
             httpLogActivity: HttpLogActivity, filter: List<ListData>,
-            key: String
+            key: String, number: String
         ) {
             listData.clear()
             keyword = key
+            this.number = number
             listData.addAll(filter)
             httpLogActivity.startActivity(
                 Intent(
@@ -40,6 +41,7 @@ open class HttpLogFilterActivity : AppCompatActivity() {
 
         val listData = arrayListOf<ListData>()
         var keyword = ""
+        var number = ""
     }
 
 
@@ -67,7 +69,7 @@ open class HttpLogFilterActivity : AppCompatActivity() {
         recyclerView?.adapter = mLogAdapter
         recyclerView?.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
-        tvTitle?.text = "共找到：${listData.size} 条数据；关键字：$keyword"
+        tvTitle?.text = "数据总数：${number}；筛选出：${listData.size} 条数据；\n关键字：$keyword"
     }
 
     /**
