@@ -144,7 +144,10 @@ open class HttpLogActivity : AppCompatActivity() {
                     if (filter.isNullOrEmpty()) {
                         "没有找到相关数据".show()
                     } else {
-                        HttpLogFilterActivity.startActivity(this@HttpLogActivity, filter)
+                        HttpLogFilterActivity.startActivity(
+                            this@HttpLogActivity,
+                            filter, text
+                        )
                     }
                 }
             }

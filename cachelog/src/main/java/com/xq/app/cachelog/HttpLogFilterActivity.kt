@@ -2,6 +2,7 @@ package com.xq.app.cachelog
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -19,10 +20,15 @@ open class HttpLogFilterActivity : AppCompatActivity() {
     private var recyclerView: RecyclerView? = null
     private var mLogAdapter: LogAdapter? = null
     private var mMainScope = MainScope()
+    private var tvTitle: TextView? = null
 
     companion object {
-        fun startActivity(httpLogActivity: HttpLogActivity, filter: List<ListData>) {
+        fun startActivity(
+            httpLogActivity: HttpLogActivity, filter: List<ListData>,
+            key: String
+        ) {
             listData.clear()
+            keyword = key
             listData.addAll(filter)
             httpLogActivity.startActivity(
                 Intent(
@@ -33,6 +39,7 @@ open class HttpLogFilterActivity : AppCompatActivity() {
         }
 
         val listData = arrayListOf<ListData>()
+        var keyword = ""
     }
 
 
@@ -52,6 +59,7 @@ open class HttpLogFilterActivity : AppCompatActivity() {
      */
     private fun initView() {
         recyclerView = findViewById(R.id.xp_log_http_activity_recyclerview)
+        tvTitle = findViewById(R.id.xp_log_http_activity_tvtit)
         mLogAdapter = LogAdapter(this, mMainScope) {
         }
         mLogAdapter?.list?.addAll(listData)
@@ -59,6 +67,7 @@ open class HttpLogFilterActivity : AppCompatActivity() {
         recyclerView?.adapter = mLogAdapter
         recyclerView?.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
+        tvTitle?.text = "共找到：${listData.size} 条数据；关键字：$keyword"
     }
 
     /**
