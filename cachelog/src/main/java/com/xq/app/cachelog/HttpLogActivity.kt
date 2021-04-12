@@ -95,7 +95,8 @@ open class HttpLogActivity : AppCompatActivity() {
 
 
         mLogAdapter = LogAdapter(this, mMainScope) {
-            loadMoreData()
+//            loadMoreData()
+            addData(null)
         }
         recyclerView?.layoutManager = LinearLayoutManager(this)
         recyclerView?.adapter = mLogAdapter
@@ -138,12 +139,15 @@ open class HttpLogActivity : AppCompatActivity() {
         if (!TextUtils.isEmpty(text)) {
             mMainScope.launch(Dispatchers.IO) {
                 mLogAdapter?.let {
-                    val filter = it.list.filter { data ->
+                    var filter = it.list.filter { data ->
                         data.data?.url?.contains(text, true) == true
                     }
                     if (filter.isNullOrEmpty()) {
                         "没有找到相关数据".show()
                     } else {
+                        filter = filter.sortedBy {
+                            it.data?.logId?.toLong()
+                        }
                         HttpLogFilterActivity.startActivity(
                             this@HttpLogActivity,
                             filter, text, it.list.size.toString()
@@ -199,6 +203,10 @@ open class HttpLogActivity : AppCompatActivity() {
                         startIndex = logCounts - count
                     }
                     var counts = if (startIndex == 0L) logCounts else count
+                    //去掉分页的代码
+                    startIndex = 0
+                    counts = logCounts
+                    //想要分页请注释掉上面这一行
                     val logs = LogCacheManager.getLogs(startIndex, counts)
                     setData(logs)
                 }
