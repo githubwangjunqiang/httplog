@@ -168,4 +168,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
 
 
     }
+
+    fun doClickFull(view: View) {
+        startActivity(Intent(this, FullscreenActivity::class.java))
+    }
 }
