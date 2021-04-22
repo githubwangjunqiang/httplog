@@ -1,15 +1,27 @@
 package com.example.logcache
 
+import android.Manifest
+import android.app.Activity
+import android.app.AppOpsManager
+import android.app.usage.UsageEvents
+import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
 import android.hardware.*
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.os.UserManager
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.xq.app.cachelog.LogCacheManager
+import com.xq.app.cachelog.utils.format
+import com.xq.app.cachelog.utils.show
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -90,6 +102,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
 
     override fun onResume() {
         super.onResume()
+
+
         mSensorManager?.let {
             mAccelerometer?.run {
                 it.registerListener(this@MainActivity, this, SensorManager.SENSOR_DELAY_NORMAL)
@@ -171,5 +185,122 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
 
     fun doClickFull(view: View) {
         startActivity(Intent(this, FullscreenActivity::class.java))
+    }
+
+    fun doClickuserstats(view: View) {
+        if (!havePermissionForTest(this)) {
+            goToSettingIntent(this)
+            return
+        }
+        val usermananger: UserManager = this.getSystemService(Context.USER_SERVICE) as UserManager
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            val userUnlocked = usermananger.isUserUnlocked
+            Log.d("12345", "userUnlocked: ${userUnlocked}")
+            Log.d("12345", "isSystemUser: ${usermananger.isSystemUser}")
+        }
+
+
+        val currentTimeMillis = System.currentTimeMillis()
+
+        val systemService: UsageStatsManager = this
+            .getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+
+        val queryEvents =
+            systemService.queryEvents(1619077116000, 1619077147000)
+//            systemService.queryEvents(currentTimeMillis - 1000 * 60 * 60, currentTimeMillis)
+
+
+        if (!queryEvents.hasNextEvent()) {
+            "没有查询到任何数据".show()
+            return
+        }
+        val eventOut = UsageEvents.Event()
+
+        var time = 0L
+        var startTime = 1619077116000
+        var pauseType = 0
+
+
+        while (queryEvents.getNextEvent(eventOut)) {
+            val packageName = eventOut.packageName
+            val timeStamp = eventOut.timeStamp
+            val eventType = eventOut.eventType
+            if ("com.maxgames.stickwarlegacy" != eventOut.packageName) {
+                Log.d("12345", "包名不对:${eventOut.packageName} ")
+                continue
+            }
+            when (eventType) {
+                UsageEvents.Event.ACTIVITY_PAUSED -> {
+                    if (pauseType == eventType) {
+                        continue
+                    }
+                    time += timeStamp - startTime
+                    pauseType = eventType
+//                    showPause = true
+//
+//                    if (timeResumed < timesmorning) {
+//                        allTime -= (timesmorning - timeResumed)
+//                    }
+//                    if (allTime < 0) {
+//                        allTime = 0
+//                    }
+                }
+                UsageEvents.Event.ACTIVITY_RESUMED -> {
+                    startTime = timeStamp
+                    pauseType = eventType
+                }
+            }
+            Log.d(
+                "12345",
+                "doClickuserstats:${packageName}--${timeStamp.format()}:{${timeStamp}}--${eventType} "
+            )
+            Log.d("12345", "time:${time} ")
+        }
+
+
+
+
+
+        Log.d("12345", "alltime:${time} ")
+    }
+
+    fun havePermissionForTest(context: Context): Boolean {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val packageManager = context.packageManager
+                val applicationInfo = packageManager.getApplicationInfo(context.packageName, 0)
+                val appOpsManager =
+                    context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+                val mode = appOpsManager.checkOpNoThrow(
+                    AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    applicationInfo.uid,
+                    applicationInfo.packageName
+                )
+                mode == AppOpsManager.MODE_ALLOWED
+            } else {
+                true
+            }
+        } catch (e: Exception) {
+            true
+        }
+    }
+
+    fun goToSettingIntent(context: Context) {
+        try {
+            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            try {
+                val intent = Intent(Settings.ACTION_SETTINGS)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+            } catch (e1: java.lang.Exception) {
+                e1.printStackTrace()
+                e1.message.show()
+            }
+        }
     }
 }
