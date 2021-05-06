@@ -303,4 +303,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener2 {
             }
         }
     }
+
+    fun doclickkapian(view: View) {
+        startActivity(Intent(this, RecyleviewActivity::class.java))
+    }
 }
